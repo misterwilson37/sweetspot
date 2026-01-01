@@ -14,6 +14,8 @@
             --accent-cyan: #00f5d4;
             --accent-magenta: #f72585;
             --accent-yellow: #fee440;
+            --accent-green: #4ade80;
+            --accent-blue: #3b82f6;
             --text-primary: #ffffff;
             --text-muted: #6b7280;
             --border-color: #2a2a3a;
@@ -30,7 +32,6 @@
         
         h1, h2, h3, .heading { font-family: 'Century Gothic', 'Urbanist', 'Questrial', sans-serif; font-weight: 700; }
         .glow-cyan { text-shadow: 0 0 20px var(--accent-cyan); }
-        .glow-magenta { text-shadow: 0 0 20px var(--accent-magenta); }
         
         .panel {
             background: var(--bg-panel);
@@ -44,7 +45,7 @@
             border-radius: 8px;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 1px;
             transition: all 0.2s ease;
             cursor: pointer;
@@ -52,25 +53,19 @@
         }
         
         .btn-cyan { background: var(--accent-cyan); color: var(--bg-dark); }
-        .btn-cyan:hover { box-shadow: 0 0 20px var(--accent-cyan); transform: translateY(-2px); }
+        .btn-cyan:hover { box-shadow: 0 0 20px var(--accent-cyan); transform: translateY(-1px); }
         .btn-magenta { background: var(--accent-magenta); color: white; }
-        .btn-magenta:hover { box-shadow: 0 0 20px var(--accent-magenta); transform: translateY(-2px); }
+        .btn-magenta:hover { box-shadow: 0 0 20px var(--accent-magenta); }
+        .btn-green { background: var(--accent-green); color: var(--bg-dark); }
+        .btn-green:hover { box-shadow: 0 0 20px var(--accent-green); }
+        .btn-blue { background: var(--accent-blue); color: white; }
+        .btn-blue:hover { box-shadow: 0 0 20px var(--accent-blue); }
         .btn-outline { background: transparent; border: 2px solid var(--border-color); color: var(--text-primary); }
         .btn-outline:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
         .btn-danger { background: #dc2626; color: white; }
-        .btn-danger:hover { box-shadow: 0 0 20px #dc2626; }
+        .btn-sm { padding: 6px 12px; font-size: 10px; }
         
-        #imageCanvas { cursor: crosshair; max-width: 100%; border-radius: 8px; }
-        
-        .zone-list-item {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 8px;
-        }
-        .zone-good { border-left: 4px solid #4ade80; }
-        .zone-perfect { border-left: 4px solid #3b82f6; }
+        .btn-active { box-shadow: 0 0 15px currentColor; }
         
         input, textarea, select {
             background: rgba(255,255,255,0.05);
@@ -83,28 +78,62 @@
             width: 100%;
         }
         input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent-cyan); }
-        select option { background: var(--bg-panel); }
         
-        .radio-group { display: flex; gap: 8px; }
-        .radio-btn {
-            padding: 8px 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 12px;
+        #canvasContainer {
+            position: relative;
+            background: #1a1a2e;
+            border-radius: 8px;
+            overflow: hidden;
         }
-        .radio-btn.active { border-color: var(--accent-cyan); background: rgba(0, 245, 212, 0.1); }
         
-        .level-card {
+        #imageCanvas {
+            display: block;
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        
+        #overlayCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        
+        #interactionLayer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: crosshair;
+        }
+        
+        .zone-set-item {
             background: rgba(255,255,255,0.03);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            overflow: hidden;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
             transition: all 0.2s;
         }
-        .level-card:hover { border-color: var(--accent-cyan); transform: translateY(-4px); }
-        .level-card img { width: 100%; height: 150px; object-fit: cover; }
+        .zone-set-item:hover { border-color: var(--accent-cyan); }
+        .zone-set-item.selected { 
+            border-color: var(--accent-cyan); 
+            background: rgba(0, 245, 212, 0.1);
+        }
+        .zone-set-item.white-set { border-left: 4px solid #fff; }
+        .zone-set-item.black-set { border-left: 4px solid #666; }
+        
+        .mode-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .mode-draw { background: rgba(74, 222, 128, 0.2); color: var(--accent-green); }
+        .mode-edit { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
         
         .toast {
             position: fixed;
@@ -153,13 +182,36 @@
             font-weight: 600;
         }
         .tab-btn.active { border-bottom-color: var(--accent-cyan); color: var(--accent-cyan); }
-        .tab-btn:hover:not(.active) { color: var(--accent-cyan); }
         
         .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .status-connected { background: #4ade80; }
         .status-disconnected { background: #dc2626; }
         
         .hidden { display: none !important; }
+        
+        .help-text { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        
+        .distance-label {
+            position: absolute;
+            background: rgba(0,0,0,0.8);
+            color: var(--accent-cyan);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            pointer-events: none;
+        }
+        
+        .level-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .level-card:hover { border-color: var(--accent-cyan); transform: translateY(-4px); }
+        .level-card img { width: 100%; height: 150px; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -169,15 +221,9 @@
             <h1 class="text-4xl font-bold heading glow-cyan mb-2">THE SWEET SPOT</h1>
             <p class="text-gray-400 mb-8">Level Editor</p>
             <button id="googleSignInBtn" class="btn btn-cyan flex items-center gap-3 mx-auto">
-                <svg width="20" height="20" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
+                <svg width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
                 Sign in with Google
             </button>
-            <p class="text-gray-600 text-sm mt-6">Authentication required to edit levels</p>
         </div>
     </div>
 
@@ -190,22 +236,22 @@
     </div>
 
     <!-- Header -->
-    <header class="border-b border-gray-800 py-4 px-6">
+    <header class="border-b border-gray-800 py-3 px-6">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <h1 class="text-2xl font-bold heading glow-cyan">THE SWEET SPOT</h1>
+                <h1 class="text-xl font-bold heading glow-cyan">THE SWEET SPOT</h1>
                 <span class="text-xs bg-gray-800 px-3 py-1 rounded-full">EDITOR</span>
             </div>
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2 text-sm">
                     <span class="status-dot" id="connectionStatus"></span>
-                    <span id="connectionText">Checking...</span>
+                    <span id="connectionText" class="text-xs">Checking...</span>
                 </div>
                 <div id="userInfo" class="hidden items-center gap-3">
                     <span id="userName" class="text-sm text-gray-400"></span>
-                    <button id="signOutBtn" class="text-xs text-gray-500 hover:text-red-400 transition-colors">Sign Out</button>
+                    <button id="signOutBtn" class="text-xs text-gray-500 hover:text-red-400">Sign Out</button>
                 </div>
-                <a href="game.html" class="btn btn-outline text-sm">Play Game →</a>
+                <a href="game.html" class="btn btn-outline btn-sm">Play Game →</a>
             </div>
         </div>
     </header>
@@ -220,87 +266,134 @@
     </div>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto p-6">
+    <main class="max-w-7xl mx-auto p-4">
         
         <!-- Editor Tab -->
         <div id="editorTab" class="tab-content">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
                 
-                <!-- Left Panel: Canvas -->
-                <div class="lg:col-span-2">
+                <!-- Left Panel: Canvas (8 cols) -->
+                <div class="lg:col-span-8">
                     <div class="panel p-4">
-                        <div class="flex items-center justify-between mb-4">
+                        <!-- Image Controls -->
+                        <div class="flex items-center justify-between mb-3">
                             <h2 class="text-lg font-bold heading">Image Canvas</h2>
                             <div class="flex gap-2">
-                                <label class="btn btn-outline cursor-pointer">
-                                    Upload File
+                                <label class="btn btn-outline btn-sm cursor-pointer">
+                                    Upload
                                     <input type="file" id="imageUpload" accept="image/*,video/webm" class="hidden">
                                 </label>
                             </div>
                         </div>
                         
-                        <div class="flex gap-2 mb-4">
-                            <input type="text" id="imageUrlInput" placeholder="Or paste image URL here..." class="flex-1">
-                            <button id="loadUrlBtn" class="btn btn-cyan">Load URL</button>
+                        <div class="flex gap-2 mb-3">
+                            <input type="text" id="imageUrlInput" placeholder="Or paste image URL..." class="flex-1 text-sm">
+                            <button id="loadUrlBtn" class="btn btn-cyan btn-sm">Load</button>
                         </div>
                         
-                        <div id="canvasContainer" class="relative bg-black/50 rounded-lg min-h-[400px] flex items-center justify-center">
+                        <!-- Canvas Area -->
+                        <div id="canvasContainer" class="min-h-[400px] flex items-center justify-center">
                             <canvas id="imageCanvas"></canvas>
-                            <p id="canvasPlaceholder" class="text-gray-500">Upload an image to begin</p>
+                            <canvas id="overlayCanvas"></canvas>
+                            <canvas id="interactionLayer"></canvas>
+                            <p id="canvasPlaceholder" class="text-gray-500 absolute">Upload an image to begin</p>
                         </div>
                         
-                        <div class="mt-4 flex flex-wrap gap-4 items-center">
-                            <div>
-                                <label class="text-xs text-gray-400 block mb-1">Zone Type</label>
-                                <div class="radio-group">
-                                    <button class="radio-btn active" data-zone-type="good">Good Zone</button>
-                                    <button class="radio-btn" data-zone-type="perfect">Perfect Zone</button>
-                                </div>
+                        <!-- Mode & Tools -->
+                        <div class="mt-3 flex flex-wrap gap-3 items-center">
+                            <div class="flex items-center gap-2">
+                                <span class="mode-indicator" id="modeIndicator">
+                                    <span class="mode-dot"></span>
+                                    <span id="modeText">Select Mode</span>
+                                </span>
                             </div>
-                            <div>
-                                <label class="text-xs text-gray-400 block mb-1">Text Color</label>
-                                <div class="radio-group">
-                                    <button class="radio-btn active" data-color="white">White</button>
-                                    <button class="radio-btn" data-color="black">Black</button>
-                                </div>
+                            
+                            <div class="flex gap-2 ml-auto">
+                                <button id="selectModeBtn" class="btn btn-blue btn-sm btn-active">Select</button>
+                                <button id="drawGoodBtn" class="btn btn-green btn-sm">+ Good Zone</button>
+                                <button id="drawPerfectBtn" class="btn btn-blue btn-sm">+ Perfect Zone</button>
                             </div>
-                            <button id="undoBtn" class="btn btn-outline ml-auto">Undo</button>
-                            <button id="clearZonesBtn" class="btn btn-danger">Clear All</button>
+                        </div>
+                        
+                        <!-- Instructions -->
+                        <div class="mt-3 p-3 bg-black/30 rounded-lg">
+                            <p class="text-xs text-gray-400" id="instructions">
+                                <strong>Select Mode:</strong> Click zones to select. Drag corners/edges to resize. Press Delete to remove.<br>
+                                <strong>Draw Mode:</strong> Click and drag to create new zones.
+                            </p>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Right Panel: Settings -->
-                <div class="space-y-4">
+                <!-- Right Panel: Zone Sets (4 cols) -->
+                <div class="lg:col-span-4 space-y-4">
+                    
+                    <!-- Level Info -->
                     <div class="panel p-4">
-                        <h3 class="font-bold heading mb-4">Level Settings</h3>
-                        <div class="space-y-4">
+                        <h3 class="font-bold heading mb-3 text-sm">Level Info</h3>
+                        <div class="space-y-3">
                             <div>
-                                <label class="text-xs text-gray-400 block mb-1">Level Name</label>
-                                <input type="text" id="levelName" placeholder="e.g., Mountain Lake">
+                                <label class="text-xs text-gray-400">Level Name</label>
+                                <input type="text" id="levelName" placeholder="e.g., Mountain Lake" class="text-sm">
                             </div>
                             <div>
-                                <label class="text-xs text-gray-400 block mb-1">General Feedback</label>
-                                <textarea id="levelFeedback" rows="2" placeholder="Shown when no good spot exists..."></textarea>
-                            </div>
-                            <div>
-                                <label class="text-xs text-gray-400 block mb-1">Placement Feedback</label>
-                                <textarea id="placementFeedback" rows="2" placeholder="Shown after answer..."></textarea>
+                                <label class="text-xs text-gray-400">"No Good Spot" Feedback</label>
+                                <textarea id="levelFeedback" rows="2" placeholder="Shown when image has no good spots..." class="text-sm"></textarea>
                             </div>
                         </div>
                     </div>
                     
+                    <!-- Zone Sets -->
                     <div class="panel p-4">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-bold heading">Zones</h3>
-                            <span class="text-xs text-gray-400" id="zoneCount">0 zones</span>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold heading text-sm">Zone Sets</h3>
+                            <button id="addZoneSetBtn" class="btn btn-cyan btn-sm">+ New Set</button>
                         </div>
-                        <div id="zonesList" class="max-h-[300px] overflow-y-auto space-y-2">
-                            <p class="text-gray-500 text-sm">Draw zones on the image</p>
+                        
+                        <div id="zoneSetsList" class="space-y-2 max-h-[250px] overflow-y-auto">
+                            <p class="text-gray-500 text-sm text-center py-4">No zone sets yet</p>
                         </div>
                     </div>
                     
-                    <div class="panel p-4 space-y-3">
+                    <!-- Selected Zone Set Editor -->
+                    <div id="zoneSetEditor" class="panel p-4 hidden">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold heading text-sm">Edit Zone Set</h3>
+                            <button id="deleteZoneSetBtn" class="btn btn-danger btn-sm">Delete Set</button>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-xs text-gray-400">Set Name</label>
+                                <input type="text" id="zoneSetName" placeholder="e.g., Above Water" class="text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400">Text Color</label>
+                                <div class="flex gap-2 mt-1">
+                                    <button class="btn btn-sm flex-1 color-btn" data-color="white" style="background:#fff;color:#000;">White</button>
+                                    <button class="btn btn-sm flex-1 color-btn" data-color="black" style="background:#333;color:#fff;">Black</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400">Placement Feedback</label>
+                                <textarea id="zoneSetFeedback" rows="2" placeholder="Shown after player places text..." class="text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400">Perfect Zone Hint</label>
+                                <textarea id="perfectZoneHint" rows="2" placeholder="Hint for near-perfect placements..." class="text-sm"></textarea>
+                            </div>
+                            
+                            <div class="pt-2 border-t border-gray-700">
+                                <p class="text-xs text-gray-400 mb-2">Zones in this set:</p>
+                                <div id="setZonesList" class="text-xs space-y-1">
+                                    <p class="text-gray-500">No zones yet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="panel p-4 space-y-2">
                         <button id="saveLevelBtn" class="btn btn-cyan w-full">Save Level</button>
                         <button id="newLevelBtn" class="btn btn-outline w-full">New Level</button>
                     </div>
@@ -310,71 +403,48 @@
         
         <!-- Levels Tab -->
         <div id="levelsTab" class="tab-content hidden">
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-bold heading">All Levels</h2>
-                <button id="refreshLevelsBtn" class="btn btn-outline">Refresh</button>
+                <button id="refreshLevelsBtn" class="btn btn-outline btn-sm">Refresh</button>
             </div>
-            <div id="levelsList" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <p class="text-gray-500 col-span-full text-center py-12">Loading levels...</p>
+            <div id="levelsList" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                <p class="text-gray-500 col-span-full text-center py-12">Loading...</p>
             </div>
         </div>
         
         <!-- Migration Tab -->
         <div id="migrateTab" class="tab-content hidden">
-            <div class="max-w-2xl mx-auto">
-                <div class="panel p-6">
-                    <h2 class="text-xl font-bold heading mb-2">Migrate Original Images</h2>
-                    <p class="text-gray-400 mb-6">Download original game images and upload them to Firebase.</p>
-                    
-                    <div id="migrationProgress" class="hidden mb-6">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm">Progress</span>
-                            <span id="migrationCount" class="text-sm">0 / 10</span>
-                        </div>
-                        <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
-                            <div id="migrationBar" class="h-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300" style="width: 0%"></div>
-                        </div>
-                        <div id="migrationLog" class="mt-4 bg-black/50 rounded-lg p-4 max-h-[300px] overflow-y-auto font-mono text-xs space-y-1"></div>
+            <div class="max-w-2xl mx-auto panel p-6">
+                <h2 class="text-xl font-bold heading mb-2">Migrate Original Images</h2>
+                <p class="text-gray-400 mb-6">Download original game images and upload them to Firebase.</p>
+                
+                <div id="migrationProgress" class="hidden mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm">Progress</span>
+                        <span id="migrationCount" class="text-sm">0 / 10</span>
                     </div>
-                    
-                    <button id="startMigrationBtn" class="btn btn-magenta">Start Migration</button>
+                    <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                        <div id="migrationBar" class="h-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all" style="width: 0%"></div>
+                    </div>
+                    <div id="migrationLog" class="mt-4 bg-black/50 rounded-lg p-4 max-h-[300px] overflow-y-auto font-mono text-xs space-y-1"></div>
                 </div>
+                
+                <button id="startMigrationBtn" class="btn btn-magenta">Start Migration</button>
             </div>
         </div>
     </main>
 
-    <!-- Zone Edit Modal -->
-    <div id="zoneModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
-        <div class="panel p-6 w-full max-w-md mx-4">
-            <h3 class="text-lg font-bold heading mb-4">Edit Zone</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Zone ID</label>
-                    <input type="text" id="zoneId" placeholder="e.g., sky_centered">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Hint</label>
-                    <textarea id="zoneHint" rows="3" placeholder="Shown when close but not perfect..."></textarea>
-                </div>
-            </div>
-            <div class="flex gap-3 mt-6">
-                <button id="saveZoneBtn" class="btn btn-cyan flex-1">Save</button>
-                <button id="cancelZoneBtn" class="btn btn-outline flex-1">Cancel</button>
-            </div>
-        </div>
-    </div>
-
     <script type="module">
         // ============================================
-        // FIREBASE IMPORTS (Modular SDK - matches bell system)
+        // FIREBASE IMPORTS
         // ============================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, serverTimestamp, orderBy, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         // ============================================
-        // FIREBASE CONFIG
+        // FIREBASE CONFIG & INIT
         // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyDfo45UBu-pR8nqMQhVlS_QgyYZ2kzBdvM",
@@ -384,9 +454,6 @@
             appId: "1:441560045695:web:94e51a006663404b8f474a"
         };
 
-        // ============================================
-        // INITIALIZE FIREBASE
-        // ============================================
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -398,28 +465,50 @@
         // ============================================
         // STATE
         // ============================================
+        
+        // Level data structure
         let currentLevel = {
             id: null,
             name: '',
             imageUrl: '',
             imagePath: '',
-            feedback: '',
-            placementFeedback: '',
-            goodZones: { white: [], black: [] },
-            perfectZones: { white: [], black: [] }
+            feedback: '', // "No good spot" feedback
+            zoneSets: []  // Array of zone sets
         };
         
-        let currentZoneType = 'good';
-        let currentColor = 'white';
+        /*
+        Zone Set structure:
+        {
+            id: 'set_1',
+            name: 'Above Water',
+            color: 'white', // or 'black'
+            placementFeedback: '',
+            perfectHint: '',
+            goodZones: [{ x, y, width, height }],
+            perfectZone: { x, y, width, height } // Only one perfect zone per set
+        }
+        */
+        
+        // Editor state
+        let editorMode = 'select'; // 'select', 'drawGood', 'drawPerfect'
+        let selectedSetId = null;
+        let selectedZoneType = null; // 'good' or 'perfect'
+        let selectedZoneIndex = null;
+        let dragHandle = null; // Which handle is being dragged
         let isDrawing = false;
-        let startX, startY;
-        let tempRect = null;
-        let editingZoneIndex = null;
-        let editingZoneColor = null;
-        let editingZoneType = null;
-        let canvas, ctx;
+        let drawStart = { x: 0, y: 0 };
+        let tempZone = null;
+        
+        // Canvas refs
+        let imageCanvas, imageCtx;
+        let overlayCanvas, overlayCtx;
+        let interactionCanvas;
         let loadedImage = null;
-        let imageScale = 1;
+        let canvasScale = 1;
+        
+        // Text preview dimensions (approximate)
+        const TEXT_WIDTH_PERCENT = 25;
+        const TEXT_HEIGHT_PERCENT = 12;
 
         // ============================================
         // UI HELPERS
@@ -442,65 +531,68 @@
         }
         
         function showConnectionStatus(connected, text) {
-            const dot = document.getElementById('connectionStatus');
-            const label = document.getElementById('connectionText');
-            dot.className = 'status-dot ' + (connected ? 'status-connected' : 'status-disconnected');
-            label.textContent = text;
+            document.getElementById('connectionStatus').className = 'status-dot ' + (connected ? 'status-connected' : 'status-disconnected');
+            document.getElementById('connectionText').textContent = text;
+        }
+        
+        function updateModeIndicator() {
+            const indicator = document.getElementById('modeIndicator');
+            const text = document.getElementById('modeText');
+            
+            indicator.className = 'mode-indicator';
+            
+            if (editorMode === 'select') {
+                indicator.classList.add('mode-edit');
+                text.textContent = 'Select Mode';
+            } else if (editorMode === 'drawGood') {
+                indicator.classList.add('mode-draw');
+                text.textContent = 'Drawing Good Zone';
+            } else if (editorMode === 'drawPerfect') {
+                indicator.classList.add('mode-draw');
+                text.textContent = 'Drawing Perfect Zone';
+            }
+            
+            // Update button states
+            document.getElementById('selectModeBtn').classList.toggle('btn-active', editorMode === 'select');
+            document.getElementById('drawGoodBtn').classList.toggle('btn-active', editorMode === 'drawGood');
+            document.getElementById('drawPerfectBtn').classList.toggle('btn-active', editorMode === 'drawPerfect');
+            
+            // Update cursor
+            interactionCanvas.style.cursor = editorMode === 'select' ? 'default' : 'crosshair';
         }
 
         // ============================================
         // AUTHENTICATION
         // ============================================
         onAuthStateChanged(auth, (user) => {
-            const loginOverlay = document.getElementById('loginOverlay');
-            const userInfo = document.getElementById('userInfo');
-            const userName = document.getElementById('userName');
-            
             if (user) {
                 currentUser = user;
                 firebaseReady = true;
-                
-                loginOverlay.classList.add('hidden');
-                userInfo.classList.remove('hidden');
-                userInfo.style.display = 'flex';
-                userName.textContent = user.displayName || user.email || 'User';
-                
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('userInfo').classList.remove('hidden');
+                document.getElementById('userInfo').style.display = 'flex';
+                document.getElementById('userName').textContent = user.displayName || user.email || 'User';
                 showConnectionStatus(true, "Connected");
-                console.log("Signed in as:", user.displayName || user.email);
             } else {
                 currentUser = null;
                 firebaseReady = false;
-                
-                loginOverlay.classList.remove('hidden');
-                userInfo.classList.add('hidden');
-                
+                document.getElementById('loginOverlay').classList.remove('hidden');
+                document.getElementById('userInfo').classList.add('hidden');
                 showConnectionStatus(false, "Not signed in");
             }
         });
         
-        async function signInWithGoogle() {
+        document.getElementById('googleSignInBtn').addEventListener('click', async () => {
             try {
-                const provider = new GoogleAuthProvider();
-                await signInWithPopup(auth, provider);
+                await signInWithPopup(auth, new GoogleAuthProvider());
             } catch (error) {
-                console.error("Google Sign-In Error:", error);
                 if (error.code !== 'auth/popup-closed-by-user') {
                     showToast("Sign in failed: " + error.message, "error");
                 }
             }
-        }
+        });
         
-        async function signOutUser() {
-            try {
-                await firebaseSignOut(auth);
-                showToast("Signed out", "info");
-            } catch (error) {
-                console.error("Sign out error:", error);
-            }
-        }
-        
-        document.getElementById('googleSignInBtn').addEventListener('click', signInWithGoogle);
-        document.getElementById('signOutBtn').addEventListener('click', signOutUser);
+        document.getElementById('signOutBtn').addEventListener('click', () => firebaseSignOut(auth));
 
         // ============================================
         // TAB NAVIGATION
@@ -511,22 +603,26 @@
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
                 btn.classList.add('active');
                 document.getElementById(btn.dataset.tab + 'Tab').classList.remove('hidden');
-                
                 if (btn.dataset.tab === 'levels') loadLevelsList();
             });
         });
 
         // ============================================
-        // CANVAS
+        // CANVAS SETUP
         // ============================================
-        function initCanvas() {
-            canvas = document.getElementById('imageCanvas');
-            ctx = canvas.getContext('2d');
+        function initCanvases() {
+            imageCanvas = document.getElementById('imageCanvas');
+            imageCtx = imageCanvas.getContext('2d');
+            overlayCanvas = document.getElementById('overlayCanvas');
+            overlayCtx = overlayCanvas.getContext('2d');
+            interactionCanvas = document.getElementById('interactionLayer');
             
-            canvas.addEventListener('mousedown', handleMouseDown);
-            canvas.addEventListener('mousemove', handleMouseMove);
-            canvas.addEventListener('mouseup', handleMouseUp);
-            canvas.addEventListener('mouseleave', handleMouseUp);
+            interactionCanvas.addEventListener('mousedown', handleMouseDown);
+            interactionCanvas.addEventListener('mousemove', handleMouseMove);
+            interactionCanvas.addEventListener('mouseup', handleMouseUp);
+            interactionCanvas.addEventListener('mouseleave', handleMouseUp);
+            
+            window.addEventListener('keydown', handleKeyDown);
         }
         
         function loadImageToCanvas(imageUrl) {
@@ -536,235 +632,642 @@
             img.onload = () => {
                 loadedImage = img;
                 const container = document.getElementById('canvasContainer');
-                const maxWidth = container.clientWidth - 32;
+                const maxWidth = container.clientWidth;
                 const maxHeight = 500;
                 
-                imageScale = Math.min(maxWidth / img.width, maxHeight / img.height, 1);
+                canvasScale = Math.min(maxWidth / img.width, maxHeight / img.height, 1);
                 
-                canvas.width = img.width * imageScale;
-                canvas.height = img.height * imageScale;
+                const w = img.width * canvasScale;
+                const h = img.height * canvasScale;
                 
+                imageCanvas.width = overlayCanvas.width = interactionCanvas.width = w;
+                imageCanvas.height = overlayCanvas.height = interactionCanvas.height = h;
+                
+                imageCtx.drawImage(img, 0, 0, w, h);
                 document.getElementById('canvasPlaceholder').classList.add('hidden');
-                redrawCanvas();
+                
+                redrawOverlay();
             };
             
             img.onerror = () => showToast("Failed to load image", "error");
             img.src = imageUrl;
         }
         
-        function redrawCanvas() {
+        function redrawOverlay() {
             if (!loadedImage) return;
             
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(loadedImage, 0, 0, canvas.width, canvas.height);
+            const w = overlayCanvas.width;
+            const h = overlayCanvas.height;
+            overlayCtx.clearRect(0, 0, w, h);
             
-            drawZones(currentLevel.goodZones.white, 'rgba(76, 175, 80, 0.4)', 'white');
-            drawZones(currentLevel.goodZones.black, 'rgba(76, 175, 80, 0.4)', 'black');
-            drawZones(currentLevel.perfectZones.white, 'rgba(59, 130, 246, 0.4)', 'white');
-            drawZones(currentLevel.perfectZones.black, 'rgba(59, 130, 246, 0.4)', 'black');
+            // Draw all zone sets
+            currentLevel.zoneSets.forEach(set => {
+                const isSelected = set.id === selectedSetId;
+                const baseAlpha = isSelected ? 0.5 : 0.3;
+                
+                // Draw good zones
+                set.goodZones.forEach((zone, idx) => {
+                    drawZone(zone, 'good', set.color, isSelected && selectedZoneType === 'good' && selectedZoneIndex === idx);
+                });
+                
+                // Draw perfect zone
+                if (set.perfectZone) {
+                    drawZone(set.perfectZone, 'perfect', set.color, isSelected && selectedZoneType === 'perfect');
+                    
+                    // Draw text preview in perfect zone
+                    if (isSelected || true) { // Always show text preview
+                        drawTextPreview(set.perfectZone, set.color);
+                    }
+                    
+                    // Draw distance guides if selected
+                    if (isSelected && selectedZoneType === 'perfect' && set.goodZones.length > 0) {
+                        drawDistanceGuides(set.perfectZone, set.goodZones);
+                    }
+                }
+            });
             
-            if (tempRect) {
-                const color = currentZoneType === 'good' ? 'rgba(76, 175, 80, 0.5)' : 'rgba(59, 130, 246, 0.5)';
-                ctx.fillStyle = color;
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
-                ctx.fillRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
-                ctx.strokeRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
+            // Draw temp zone while drawing
+            if (tempZone) {
+                const color = editorMode === 'drawGood' ? 'rgba(74, 222, 128, 0.5)' : 'rgba(59, 130, 246, 0.5)';
+                overlayCtx.fillStyle = color;
+                overlayCtx.strokeStyle = '#fff';
+                overlayCtx.lineWidth = 2;
+                const rect = percentToPixel(tempZone);
+                overlayCtx.fillRect(rect.x, rect.y, rect.w, rect.h);
+                overlayCtx.strokeRect(rect.x, rect.y, rect.w, rect.h);
             }
         }
         
-        function drawZones(zones, color, textColor) {
-            zones.forEach((zone, index) => {
-                const x = (zone.x / 100) * canvas.width;
-                const y = (zone.y / 100) * canvas.height;
-                const w = (zone.width / 100) * canvas.width;
-                const h = (zone.height / 100) * canvas.height;
-                
-                ctx.fillStyle = color;
-                ctx.strokeStyle = textColor === 'white' ? '#fff' : '#000';
-                ctx.lineWidth = 2;
-                ctx.setLineDash([5, 5]);
-                ctx.fillRect(x, y, w, h);
-                ctx.strokeRect(x, y, w, h);
-                ctx.setLineDash([]);
-                
-                ctx.fillStyle = textColor === 'white' ? '#fff' : '#000';
-                ctx.font = "12px 'Century Gothic', 'Urbanist', sans-serif";
-                ctx.fillText(`${textColor[0].toUpperCase()}${index + 1}`, x + 4, y + 14);
+        function drawZone(zone, type, textColor, isSelected) {
+            const rect = percentToPixel(zone);
+            const color = type === 'good' ? 'rgba(74, 222, 128,' : 'rgba(59, 130, 246,';
+            
+            overlayCtx.fillStyle = color + (isSelected ? '0.5)' : '0.3)');
+            overlayCtx.strokeStyle = isSelected ? '#fff' : (textColor === 'white' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)');
+            overlayCtx.lineWidth = isSelected ? 3 : 2;
+            overlayCtx.setLineDash(isSelected ? [] : [5, 5]);
+            
+            overlayCtx.fillRect(rect.x, rect.y, rect.w, rect.h);
+            overlayCtx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+            overlayCtx.setLineDash([]);
+            
+            // Draw resize handles if selected
+            if (isSelected) {
+                drawResizeHandles(rect);
+            }
+            
+            // Label
+            overlayCtx.fillStyle = textColor === 'white' ? '#fff' : '#000';
+            overlayCtx.font = "bold 11px 'Century Gothic', sans-serif";
+            overlayCtx.fillText(type === 'good' ? 'GOOD' : 'PERFECT', rect.x + 4, rect.y + 14);
+        }
+        
+        function drawResizeHandles(rect) {
+            const handleSize = 8;
+            const handles = getHandlePositions(rect);
+            
+            overlayCtx.fillStyle = '#fff';
+            overlayCtx.strokeStyle = '#000';
+            overlayCtx.lineWidth = 1;
+            
+            handles.forEach(h => {
+                overlayCtx.fillRect(h.x - handleSize/2, h.y - handleSize/2, handleSize, handleSize);
+                overlayCtx.strokeRect(h.x - handleSize/2, h.y - handleSize/2, handleSize, handleSize);
             });
         }
         
-        function handleMouseDown(e) {
-            if (!loadedImage) return;
-            isDrawing = true;
-            const rect = canvas.getBoundingClientRect();
-            startX = e.clientX - rect.left;
-            startY = e.clientY - rect.top;
+        function getHandlePositions(rect) {
+            return [
+                { id: 'nw', x: rect.x, y: rect.y },
+                { id: 'n', x: rect.x + rect.w/2, y: rect.y },
+                { id: 'ne', x: rect.x + rect.w, y: rect.y },
+                { id: 'e', x: rect.x + rect.w, y: rect.y + rect.h/2 },
+                { id: 'se', x: rect.x + rect.w, y: rect.y + rect.h },
+                { id: 's', x: rect.x + rect.w/2, y: rect.y + rect.h },
+                { id: 'sw', x: rect.x, y: rect.y + rect.h },
+                { id: 'w', x: rect.x, y: rect.y + rect.h/2 }
+            ];
         }
         
-        function handleMouseMove(e) {
-            if (!isDrawing || !loadedImage) return;
-            const rect = canvas.getBoundingClientRect();
-            const currentX = e.clientX - rect.left;
-            const currentY = e.clientY - rect.top;
+        function drawTextPreview(zone, textColor) {
+            const rect = percentToPixel(zone);
+            const centerX = rect.x + rect.w / 2;
+            const centerY = rect.y + rect.h / 2;
             
-            tempRect = {
-                x: Math.min(startX, currentX),
-                y: Math.min(startY, currentY),
-                width: Math.abs(currentX - startX),
-                height: Math.abs(currentY - startY)
-            };
+            overlayCtx.fillStyle = textColor === 'white' ? '#fff' : '#000';
+            overlayCtx.font = "bold 16px 'Century Gothic', sans-serif";
+            overlayCtx.textAlign = 'center';
+            overlayCtx.textBaseline = 'middle';
             
-            redrawCanvas();
+            // Draw shadow
+            overlayCtx.shadowColor = textColor === 'white' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.8)';
+            overlayCtx.shadowBlur = 4;
+            overlayCtx.shadowOffsetX = 1;
+            overlayCtx.shadowOffsetY = 1;
+            
+            overlayCtx.fillText('Read', centerX, centerY - 10);
+            overlayCtx.fillText('This Text', centerX, centerY + 10);
+            
+            overlayCtx.shadowColor = 'transparent';
+            overlayCtx.textAlign = 'left';
+            overlayCtx.textBaseline = 'alphabetic';
         }
         
-        function handleMouseUp(e) {
-            if (!isDrawing || !tempRect) {
-                isDrawing = false;
-                return;
-            }
+        function drawDistanceGuides(perfectZone, goodZones) {
+            // Find the containing good zone
+            const pRect = percentToPixel(perfectZone);
+            const pCenterX = pRect.x + pRect.w / 2;
+            const pCenterY = pRect.y + pRect.h / 2;
             
-            const zone = {
-                x: Math.round((tempRect.x / canvas.width) * 10000) / 100,
-                y: Math.round((tempRect.y / canvas.height) * 10000) / 100,
-                width: Math.round((tempRect.width / canvas.width) * 10000) / 100,
-                height: Math.round((tempRect.height / canvas.height) * 10000) / 100
+            goodZones.forEach(goodZone => {
+                const gRect = percentToPixel(goodZone);
+                
+                // Check if perfect zone is inside this good zone
+                if (pCenterX >= gRect.x && pCenterX <= gRect.x + gRect.w &&
+                    pCenterY >= gRect.y && pCenterY <= gRect.y + gRect.h) {
+                    
+                    // Draw distance lines
+                    overlayCtx.strokeStyle = 'rgba(0, 245, 212, 0.8)';
+                    overlayCtx.lineWidth = 1;
+                    overlayCtx.setLineDash([3, 3]);
+                    
+                    // Left distance
+                    const leftDist = pRect.x - gRect.x;
+                    overlayCtx.beginPath();
+                    overlayCtx.moveTo(gRect.x, pCenterY);
+                    overlayCtx.lineTo(pRect.x, pCenterY);
+                    overlayCtx.stroke();
+                    drawDistanceLabel(gRect.x + leftDist/2, pCenterY - 10, Math.round(leftDist) + 'px');
+                    
+                    // Right distance
+                    const rightDist = (gRect.x + gRect.w) - (pRect.x + pRect.w);
+                    overlayCtx.beginPath();
+                    overlayCtx.moveTo(pRect.x + pRect.w, pCenterY);
+                    overlayCtx.lineTo(gRect.x + gRect.w, pCenterY);
+                    overlayCtx.stroke();
+                    drawDistanceLabel(pRect.x + pRect.w + rightDist/2, pCenterY - 10, Math.round(rightDist) + 'px');
+                    
+                    // Top distance
+                    const topDist = pRect.y - gRect.y;
+                    overlayCtx.beginPath();
+                    overlayCtx.moveTo(pCenterX, gRect.y);
+                    overlayCtx.lineTo(pCenterX, pRect.y);
+                    overlayCtx.stroke();
+                    drawDistanceLabel(pCenterX + 10, gRect.y + topDist/2, Math.round(topDist) + 'px');
+                    
+                    // Bottom distance
+                    const bottomDist = (gRect.y + gRect.h) - (pRect.y + pRect.h);
+                    overlayCtx.beginPath();
+                    overlayCtx.moveTo(pCenterX, pRect.y + pRect.h);
+                    overlayCtx.lineTo(pCenterX, gRect.y + gRect.h);
+                    overlayCtx.stroke();
+                    drawDistanceLabel(pCenterX + 10, pRect.y + pRect.h + bottomDist/2, Math.round(bottomDist) + 'px');
+                    
+                    overlayCtx.setLineDash([]);
+                }
+            });
+        }
+        
+        function drawDistanceLabel(x, y, text) {
+            overlayCtx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            const metrics = overlayCtx.measureText(text);
+            overlayCtx.fillRect(x - metrics.width/2 - 4, y - 8, metrics.width + 8, 16);
+            
+            overlayCtx.fillStyle = '#00f5d4';
+            overlayCtx.font = "bold 10px 'Century Gothic', sans-serif";
+            overlayCtx.textAlign = 'center';
+            overlayCtx.textBaseline = 'middle';
+            overlayCtx.fillText(text, x, y);
+            overlayCtx.textAlign = 'left';
+            overlayCtx.textBaseline = 'alphabetic';
+        }
+        
+        function percentToPixel(zone) {
+            return {
+                x: (zone.x / 100) * overlayCanvas.width,
+                y: (zone.y / 100) * overlayCanvas.height,
+                w: (zone.width / 100) * overlayCanvas.width,
+                h: (zone.height / 100) * overlayCanvas.height
             };
-            
-            if (zone.width < 2 || zone.height < 2) {
-                tempRect = null;
-                isDrawing = false;
-                redrawCanvas();
-                return;
-            }
-            
-            if (currentZoneType === 'good') {
-                currentLevel.goodZones[currentColor].push(zone);
-            } else {
-                zone.id = '';
-                zone.hint = '';
-                currentLevel.perfectZones[currentColor].push(zone);
-            }
-            
-            tempRect = null;
-            isDrawing = false;
-            redrawCanvas();
-            updateZonesList();
+        }
+        
+        function pixelToPercent(x, y, w, h) {
+            return {
+                x: Math.round((x / overlayCanvas.width) * 10000) / 100,
+                y: Math.round((y / overlayCanvas.height) * 10000) / 100,
+                width: Math.round((w / overlayCanvas.width) * 10000) / 100,
+                height: Math.round((h / overlayCanvas.height) * 10000) / 100
+            };
         }
 
         // ============================================
-        // ZONES LIST
+        // MOUSE HANDLERS
         // ============================================
-        function updateZonesList() {
-            const container = document.getElementById('zonesList');
-            const allZones = [];
+        function handleMouseDown(e) {
+            if (!loadedImage) return;
             
-            ['white', 'black'].forEach(color => {
-                currentLevel.goodZones[color].forEach((zone, index) => {
-                    allZones.push({ zone, color, type: 'good', index });
-                });
-                currentLevel.perfectZones[color].forEach((zone, index) => {
-                    allZones.push({ zone, color, type: 'perfect', index });
-                });
-            });
+            const rect = interactionCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
             
-            document.getElementById('zoneCount').textContent = `${allZones.length} zones`;
+            if (editorMode === 'select') {
+                // Check if clicking on a resize handle
+                if (selectedSetId && selectedZoneType) {
+                    const set = currentLevel.zoneSets.find(s => s.id === selectedSetId);
+                    if (set) {
+                        const zone = selectedZoneType === 'perfect' ? set.perfectZone : set.goodZones[selectedZoneIndex];
+                        if (zone) {
+                            const zoneRect = percentToPixel(zone);
+                            const handles = getHandlePositions(zoneRect);
+                            
+                            for (const h of handles) {
+                                if (Math.abs(x - h.x) < 8 && Math.abs(y - h.y) < 8) {
+                                    dragHandle = h.id;
+                                    drawStart = { x, y, zone: { ...zone } };
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Check if clicking on a zone
+                const clicked = findZoneAt(x, y);
+                if (clicked) {
+                    selectedSetId = clicked.setId;
+                    selectedZoneType = clicked.type;
+                    selectedZoneIndex = clicked.index;
+                    updateZoneSetsList();
+                    updateZoneSetEditor();
+                    redrawOverlay();
+                } else {
+                    // Deselect
+                    selectedSetId = null;
+                    selectedZoneType = null;
+                    selectedZoneIndex = null;
+                    document.getElementById('zoneSetEditor').classList.add('hidden');
+                    redrawOverlay();
+                }
+            } else {
+                // Draw mode
+                if (!selectedSetId) {
+                    showToast('Select or create a Zone Set first', 'error');
+                    return;
+                }
+                
+                isDrawing = true;
+                drawStart = { x, y };
+                tempZone = null;
+            }
+        }
+        
+        function handleMouseMove(e) {
+            if (!loadedImage) return;
             
-            if (allZones.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-sm">Draw zones on the image</p>';
+            const rect = interactionCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            if (dragHandle && drawStart) {
+                // Resizing
+                const set = currentLevel.zoneSets.find(s => s.id === selectedSetId);
+                if (!set) return;
+                
+                const zone = selectedZoneType === 'perfect' ? set.perfectZone : set.goodZones[selectedZoneIndex];
+                if (!zone) return;
+                
+                const original = drawStart.zone;
+                const dx = ((x - drawStart.x) / overlayCanvas.width) * 100;
+                const dy = ((y - drawStart.y) / overlayCanvas.height) * 100;
+                
+                // Apply resize based on handle
+                if (dragHandle.includes('w')) {
+                    zone.x = Math.min(original.x + dx, original.x + original.width - 5);
+                    zone.width = original.width - (zone.x - original.x);
+                }
+                if (dragHandle.includes('e')) {
+                    zone.width = Math.max(5, original.width + dx);
+                }
+                if (dragHandle.includes('n')) {
+                    zone.y = Math.min(original.y + dy, original.y + original.height - 5);
+                    zone.height = original.height - (zone.y - original.y);
+                }
+                if (dragHandle.includes('s')) {
+                    zone.height = Math.max(5, original.height + dy);
+                }
+                
+                redrawOverlay();
+                updateSetZonesList();
+            } else if (isDrawing) {
+                // Drawing new zone
+                const w = x - drawStart.x;
+                const h = y - drawStart.y;
+                
+                tempZone = pixelToPercent(
+                    w > 0 ? drawStart.x : x,
+                    h > 0 ? drawStart.y : y,
+                    Math.abs(w),
+                    Math.abs(h)
+                );
+                
+                redrawOverlay();
+            } else if (editorMode === 'select') {
+                // Update cursor based on hover
+                if (selectedSetId && selectedZoneType) {
+                    const set = currentLevel.zoneSets.find(s => s.id === selectedSetId);
+                    if (set) {
+                        const zone = selectedZoneType === 'perfect' ? set.perfectZone : set.goodZones[selectedZoneIndex];
+                        if (zone) {
+                            const zoneRect = percentToPixel(zone);
+                            const handles = getHandlePositions(zoneRect);
+                            
+                            for (const h of handles) {
+                                if (Math.abs(x - h.x) < 8 && Math.abs(y - h.y) < 8) {
+                                    const cursors = {
+                                        'nw': 'nw-resize', 'ne': 'ne-resize', 'sw': 'sw-resize', 'se': 'se-resize',
+                                        'n': 'n-resize', 's': 's-resize', 'e': 'e-resize', 'w': 'w-resize'
+                                    };
+                                    interactionCanvas.style.cursor = cursors[h.id];
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+                interactionCanvas.style.cursor = 'default';
+            }
+        }
+        
+        function handleMouseUp(e) {
+            if (dragHandle) {
+                dragHandle = null;
+                drawStart = null;
                 return;
             }
             
-            container.innerHTML = allZones.map(({ zone, color, type, index }) => `
-                <div class="zone-list-item zone-${type}">
+            if (!isDrawing || !tempZone) {
+                isDrawing = false;
+                return;
+            }
+            
+            // Minimum size check
+            if (tempZone.width < 3 || tempZone.height < 3) {
+                tempZone = null;
+                isDrawing = false;
+                redrawOverlay();
+                return;
+            }
+            
+            // Add zone to set
+            const set = currentLevel.zoneSets.find(s => s.id === selectedSetId);
+            if (set) {
+                if (editorMode === 'drawGood') {
+                    set.goodZones.push({ ...tempZone });
+                    selectedZoneType = 'good';
+                    selectedZoneIndex = set.goodZones.length - 1;
+                } else if (editorMode === 'drawPerfect') {
+                    set.perfectZone = { ...tempZone };
+                    selectedZoneType = 'perfect';
+                    selectedZoneIndex = null;
+                }
+                
+                updateSetZonesList();
+            }
+            
+            tempZone = null;
+            isDrawing = false;
+            editorMode = 'select';
+            updateModeIndicator();
+            redrawOverlay();
+        }
+        
+        function handleKeyDown(e) {
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                if (selectedSetId && selectedZoneType) {
+                    const set = currentLevel.zoneSets.find(s => s.id === selectedSetId);
+                    if (set) {
+                        if (selectedZoneType === 'perfect') {
+                            set.perfectZone = null;
+                        } else if (selectedZoneType === 'good' && selectedZoneIndex !== null) {
+                            set.goodZones.splice(selectedZoneIndex, 1);
+                        }
+                        selectedZoneType = null;
+                        selectedZoneIndex = null;
+                        updateSetZonesList();
+                        redrawOverlay();
+                    }
+                }
+            } else if (e.key === 'Escape') {
+                editorMode = 'select';
+                tempZone = null;
+                updateModeIndicator();
+                redrawOverlay();
+            }
+        }
+        
+        function findZoneAt(x, y) {
+            // Check zones in reverse order (top-most first)
+            for (let i = currentLevel.zoneSets.length - 1; i >= 0; i--) {
+                const set = currentLevel.zoneSets[i];
+                
+                // Check perfect zone first
+                if (set.perfectZone) {
+                    const rect = percentToPixel(set.perfectZone);
+                    if (x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h) {
+                        return { setId: set.id, type: 'perfect', index: null };
+                    }
+                }
+                
+                // Check good zones
+                for (let j = set.goodZones.length - 1; j >= 0; j--) {
+                    const rect = percentToPixel(set.goodZones[j]);
+                    if (x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h) {
+                        return { setId: set.id, type: 'good', index: j };
+                    }
+                }
+            }
+            return null;
+        }
+
+        // ============================================
+        // MODE BUTTONS
+        // ============================================
+        document.getElementById('selectModeBtn').addEventListener('click', () => {
+            editorMode = 'select';
+            updateModeIndicator();
+        });
+        
+        document.getElementById('drawGoodBtn').addEventListener('click', () => {
+            if (!selectedSetId) {
+                showToast('Select or create a Zone Set first', 'error');
+                return;
+            }
+            editorMode = 'drawGood';
+            updateModeIndicator();
+        });
+        
+        document.getElementById('drawPerfectBtn').addEventListener('click', () => {
+            if (!selectedSetId) {
+                showToast('Select or create a Zone Set first', 'error');
+                return;
+            }
+            editorMode = 'drawPerfect';
+            updateModeIndicator();
+        });
+
+        // ============================================
+        // ZONE SETS UI
+        // ============================================
+        function updateZoneSetsList() {
+            const container = document.getElementById('zoneSetsList');
+            
+            if (currentLevel.zoneSets.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No zone sets yet</p>';
+                return;
+            }
+            
+            container.innerHTML = currentLevel.zoneSets.map(set => `
+                <div class="zone-set-item ${set.color}-set ${set.id === selectedSetId ? 'selected' : ''}" data-set-id="${set.id}">
                     <div class="flex items-center justify-between">
                         <div>
-                            <span class="text-xs uppercase ${type === 'good' ? 'text-green-400' : 'text-blue-400'}">${type}</span>
-                            <span class="text-xs text-gray-400 ml-2">${color}</span>
-                        </div>
-                        <div class="flex gap-2">
-                            ${type === 'perfect' ? `<button class="text-xs text-cyan-400 hover:underline" data-action="edit" data-type="${type}" data-color="${color}" data-index="${index}">Edit</button>` : ''}
-                            <button class="text-xs text-red-400 hover:underline" data-action="delete" data-type="${type}" data-color="${color}" data-index="${index}">Delete</button>
+                            <strong class="text-sm">${set.name || 'Unnamed Set'}</strong>
+                            <span class="text-xs text-gray-400 ml-2">(${set.color})</span>
                         </div>
                     </div>
                     <div class="text-xs text-gray-500 mt-1">
-                        x:${zone.x.toFixed(1)}% y:${zone.y.toFixed(1)}% w:${zone.width.toFixed(1)}% h:${zone.height.toFixed(1)}%
+                        ${set.goodZones.length} good zone${set.goodZones.length !== 1 ? 's' : ''}, 
+                        ${set.perfectZone ? '1 perfect zone' : 'no perfect zone'}
                     </div>
                 </div>
             `).join('');
             
-            // Add event listeners
-            container.querySelectorAll('[data-action="delete"]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const { type, color, index } = btn.dataset;
-                    if (type === 'good') {
-                        currentLevel.goodZones[color].splice(parseInt(index), 1);
-                    } else {
-                        currentLevel.perfectZones[color].splice(parseInt(index), 1);
-                    }
-                    redrawCanvas();
-                    updateZonesList();
+            // Add click handlers
+            container.querySelectorAll('.zone-set-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    selectedSetId = item.dataset.setId;
+                    selectedZoneType = null;
+                    selectedZoneIndex = null;
+                    updateZoneSetsList();
+                    updateZoneSetEditor();
+                    redrawOverlay();
                 });
+            });
+        }
+        
+        function updateZoneSetEditor() {
+            const editor = document.getElementById('zoneSetEditor');
+            const set = currentLevel.zoneSets.find(s => s.id === selectedSetId);
+            
+            if (!set) {
+                editor.classList.add('hidden');
+                return;
+            }
+            
+            editor.classList.remove('hidden');
+            
+            document.getElementById('zoneSetName').value = set.name || '';
+            document.getElementById('zoneSetFeedback').value = set.placementFeedback || '';
+            document.getElementById('perfectZoneHint').value = set.perfectHint || '';
+            
+            // Update color buttons
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.classList.toggle('btn-active', btn.dataset.color === set.color);
             });
             
-            container.querySelectorAll('[data-action="edit"]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const { type, color, index } = btn.dataset;
-                    editingZoneType = type;
-                    editingZoneColor = color;
-                    editingZoneIndex = parseInt(index);
-                    
-                    const zone = currentLevel.perfectZones[color][editingZoneIndex];
-                    document.getElementById('zoneId').value = zone.id || '';
-                    document.getElementById('zoneHint').value = zone.hint || '';
-                    document.getElementById('zoneModal').classList.remove('hidden');
-                    document.getElementById('zoneModal').style.display = 'flex';
-                });
-            });
+            updateSetZonesList();
         }
         
-        document.getElementById('saveZoneBtn').addEventListener('click', () => {
-            if (editingZoneIndex !== null) {
-                const zone = currentLevel.perfectZones[editingZoneColor][editingZoneIndex];
-                zone.id = document.getElementById('zoneId').value;
-                zone.hint = document.getElementById('zoneHint').value;
-                updateZonesList();
+        function updateSetZonesList() {
+            const container = document.getElementById('setZonesList');
+            const set = currentLevel.zoneSets.find(s => s.id === selectedSetId);
+            
+            if (!set) {
+                container.innerHTML = '<p class="text-gray-500">No zones yet</p>';
+                return;
             }
-            closeZoneModal();
-        });
-        
-        document.getElementById('cancelZoneBtn').addEventListener('click', closeZoneModal);
-        
-        function closeZoneModal() {
-            document.getElementById('zoneModal').classList.add('hidden');
-            document.getElementById('zoneModal').style.display = 'none';
-            editingZoneIndex = null;
+            
+            let html = '';
+            
+            set.goodZones.forEach((zone, idx) => {
+                html += `<div class="flex items-center justify-between py-1 ${selectedZoneType === 'good' && selectedZoneIndex === idx ? 'text-cyan-400' : ''}">
+                    <span>Good Zone ${idx + 1}</span>
+                    <span class="text-gray-500">${zone.width.toFixed(1)}% × ${zone.height.toFixed(1)}%</span>
+                </div>`;
+            });
+            
+            if (set.perfectZone) {
+                html += `<div class="flex items-center justify-between py-1 ${selectedZoneType === 'perfect' ? 'text-cyan-400' : ''}">
+                    <span>Perfect Zone</span>
+                    <span class="text-gray-500">${set.perfectZone.width.toFixed(1)}% × ${set.perfectZone.height.toFixed(1)}%</span>
+                </div>`;
+            }
+            
+            container.innerHTML = html || '<p class="text-gray-500">No zones yet</p>';
         }
-
-        // ============================================
-        // RADIO BUTTONS
-        // ============================================
-        document.querySelectorAll('[data-zone-type]').forEach(btn => {
+        
+        // Zone set editor event handlers
+        document.getElementById('zoneSetName').addEventListener('input', (e) => {
+            const set = currentLevel.zoneSets.find(s => s.id === selectedSetId);
+            if (set) {
+                set.name = e.target.value;
+                updateZoneSetsList();
+            }
+        });
+        
+        document.getElementById('zoneSetFeedback').addEventListener('input', (e) => {
+            const set = currentLevel.zoneSets.find(s => s.id === selectedSetId);
+            if (set) set.placementFeedback = e.target.value;
+        });
+        
+        document.getElementById('perfectZoneHint').addEventListener('input', (e) => {
+            const set = currentLevel.zoneSets.find(s => s.id === selectedSetId);
+            if (set) set.perfectHint = e.target.value;
+        });
+        
+        document.querySelectorAll('.color-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('[data-zone-type]').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentZoneType = btn.dataset.zoneType;
+                const set = currentLevel.zoneSets.find(s => s.id === selectedSetId);
+                if (set) {
+                    set.color = btn.dataset.color;
+                    updateZoneSetEditor();
+                    updateZoneSetsList();
+                    redrawOverlay();
+                }
             });
         });
         
-        document.querySelectorAll('[data-color]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('[data-color]').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentColor = btn.dataset.color;
-            });
+        document.getElementById('addZoneSetBtn').addEventListener('click', () => {
+            const newSet = {
+                id: 'set_' + Date.now(),
+                name: 'Zone Set ' + (currentLevel.zoneSets.length + 1),
+                color: 'white',
+                placementFeedback: '',
+                perfectHint: '',
+                goodZones: [],
+                perfectZone: null
+            };
+            currentLevel.zoneSets.push(newSet);
+            selectedSetId = newSet.id;
+            updateZoneSetsList();
+            updateZoneSetEditor();
+            redrawOverlay();
+        });
+        
+        document.getElementById('deleteZoneSetBtn').addEventListener('click', () => {
+            if (!selectedSetId) return;
+            if (!confirm('Delete this zone set?')) return;
+            
+            currentLevel.zoneSets = currentLevel.zoneSets.filter(s => s.id !== selectedSetId);
+            selectedSetId = null;
+            selectedZoneType = null;
+            document.getElementById('zoneSetEditor').classList.add('hidden');
+            updateZoneSetsList();
+            redrawOverlay();
         });
 
         // ============================================
-        // IMAGE UPLOAD & URL LOADING
+        // IMAGE UPLOAD & URL
         // ============================================
-        
-        // Load from URL
         document.getElementById('loadUrlBtn').addEventListener('click', loadImageFromUrl);
         document.getElementById('imageUrlInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') loadImageFromUrl();
@@ -772,104 +1275,51 @@
         
         async function loadImageFromUrl() {
             const url = document.getElementById('imageUrlInput').value.trim();
-            if (!url) {
-                showToast('Please enter a URL', 'error');
-                return;
-            }
+            if (!url) return showToast('Enter a URL', 'error');
             
-            showLoading('Loading image...');
-            
+            showLoading('Loading...');
             try {
-                // Test if URL is accessible
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Could not fetch image');
-                
-                const contentType = response.headers.get('content-type') || '';
+                if (!response.ok) throw new Error('Fetch failed');
                 const blob = await response.blob();
                 
-                // Check if it's a video (webm)
-                if (contentType.includes('video') || url.toLowerCase().endsWith('.webm')) {
+                if (response.headers.get('content-type')?.includes('video') || url.endsWith('.webm')) {
                     await extractFrameFromVideo(blob, url);
                 } else {
-                    // Regular image - upload to Firebase
                     await uploadImageBlob(blob, url);
                 }
             } catch (error) {
-                console.error('URL load error:', error);
                 hideLoading();
-                
-                // Try loading directly (for CORS-enabled images)
-                try {
-                    currentLevel.imageUrl = url;
-                    currentLevel.imagePath = '';
-                    loadImageToCanvas(url);
-                    hideLoading();
-                    showToast('Image loaded (not uploaded to Firebase)', 'info');
-                } catch (e) {
-                    showToast('Failed to load image: ' + error.message, 'error');
-                }
+                // Try direct load
+                currentLevel.imageUrl = url;
+                loadImageToCanvas(url);
+                showToast('Loaded (not uploaded)', 'info');
             }
         }
         
-        // Extract frame from WebM video
-        async function extractFrameFromVideo(blob, originalUrl) {
-            return new Promise((resolve, reject) => {
+        async function extractFrameFromVideo(blob, name) {
+            return new Promise((resolve) => {
                 const video = document.createElement('video');
-                video.crossOrigin = 'anonymous';
                 video.muted = true;
-                
-                video.onloadeddata = async () => {
-                    // Seek to first frame
-                    video.currentTime = 0;
-                };
-                
+                video.onloadeddata = () => video.currentTime = 0;
                 video.onseeked = async () => {
-                    try {
-                        // Create canvas and draw video frame
-                        const tempCanvas = document.createElement('canvas');
-                        tempCanvas.width = video.videoWidth;
-                        tempCanvas.height = video.videoHeight;
-                        const tempCtx = tempCanvas.getContext('2d');
-                        tempCtx.drawImage(video, 0, 0);
-                        
-                        // Convert to blob
-                        tempCanvas.toBlob(async (imageBlob) => {
-                            if (imageBlob) {
-                                await uploadImageBlob(imageBlob, originalUrl.replace('.webm', '.jpg'));
-                                showToast('Extracted frame from video!', 'success');
-                            } else {
-                                throw new Error('Failed to extract frame');
-                            }
-                            resolve();
-                        }, 'image/jpeg', 0.9);
-                        
-                        // Cleanup
-                        URL.revokeObjectURL(video.src);
-                    } catch (error) {
-                        reject(error);
-                    }
+                    const c = document.createElement('canvas');
+                    c.width = video.videoWidth;
+                    c.height = video.videoHeight;
+                    c.getContext('2d').drawImage(video, 0, 0);
+                    c.toBlob(async (b) => {
+                        await uploadImageBlob(b, name.replace('.webm', '.jpg'));
+                        resolve();
+                    }, 'image/jpeg', 0.9);
                 };
-                
-                video.onerror = () => {
-                    URL.revokeObjectURL(video.src);
-                    reject(new Error('Failed to load video'));
-                };
-                
                 video.src = URL.createObjectURL(blob);
-                video.load();
             });
         }
         
-        // Upload blob to Firebase
-        async function uploadImageBlob(blob, originalName) {
-            if (!firebaseReady) {
-                showToast("Please sign in first", "error");
-                hideLoading();
-                return;
-            }
+        async function uploadImageBlob(blob, name) {
+            if (!firebaseReady) return showToast('Sign in first', 'error');
             
-            const safeName = originalName.split('/').pop().split('?')[0].replace(/[^a-z0-9.]/gi, '_');
-            const fileName = `${Date.now()}_${safeName}`;
+            const fileName = `${Date.now()}_${name.split('/').pop().replace(/[^a-z0-9.]/gi, '_')}`;
             const storageRef = ref(storage, `game-images/${fileName}`);
             await uploadBytes(storageRef, blob);
             const url = await getDownloadURL(storageRef);
@@ -877,71 +1327,73 @@
             currentLevel.imageUrl = url;
             currentLevel.imagePath = `game-images/${fileName}`;
             loadImageToCanvas(url);
-            
             hideLoading();
-            showToast('Image uploaded!', 'success');
+            showToast('Uploaded!', 'success');
         }
         
-        // File upload handler
         document.getElementById('imageUpload').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            
-            if (!firebaseReady) {
-                showToast("Please sign in first", "error");
-                return;
-            }
-            
             showLoading('Processing...');
-            
             try {
-                // Check if it's a video file
-                if (file.type.includes('video') || file.name.toLowerCase().endsWith('.webm')) {
+                if (file.type.includes('video') || file.name.endsWith('.webm')) {
                     await extractFrameFromVideo(file, file.name);
                 } else {
                     await uploadImageBlob(file, file.name);
                 }
-            } catch (error) {
-                console.error('Upload error:', error);
+            } catch (err) {
                 hideLoading();
-                showToast('Upload failed: ' + error.message, 'error');
+                showToast('Upload failed', 'error');
             }
         });
 
         // ============================================
-        // LEVEL OPERATIONS
+        // LEVEL SAVE/LOAD
         // ============================================
         document.getElementById('saveLevelBtn').addEventListener('click', saveLevel);
         document.getElementById('newLevelBtn').addEventListener('click', newLevel);
-        document.getElementById('undoBtn').addEventListener('click', undoLastZone);
-        document.getElementById('clearZonesBtn').addEventListener('click', clearAllZones);
         
         async function saveLevel() {
-            if (!currentLevel.imageUrl) {
-                showToast('Upload an image first', 'error');
-                return;
-            }
-            
-            if (!firebaseReady) {
-                showToast('Please sign in first', 'error');
-                return;
-            }
+            if (!currentLevel.imageUrl) return showToast('Upload an image first', 'error');
+            if (!firebaseReady) return showToast('Sign in first', 'error');
             
             currentLevel.name = document.getElementById('levelName').value || 'Untitled';
             currentLevel.feedback = document.getElementById('levelFeedback').value;
-            currentLevel.placementFeedback = document.getElementById('placementFeedback').value;
             
-            showLoading('Saving level...');
+            showLoading('Saving...');
             
             try {
+                // Convert zone sets to game format
+                const goodZones = { white: [], black: [] };
+                const perfectZones = { white: [], black: [] };
+                let placementFeedback = '';
+                
+                currentLevel.zoneSets.forEach(set => {
+                    set.goodZones.forEach(zone => {
+                        goodZones[set.color].push({ ...zone });
+                    });
+                    
+                    if (set.perfectZone) {
+                        perfectZones[set.color].push({
+                            ...set.perfectZone,
+                            id: set.id,
+                            hint: set.perfectHint || ''
+                        });
+                        if (set.placementFeedback) {
+                            placementFeedback = set.placementFeedback;
+                        }
+                    }
+                });
+                
                 const levelData = {
                     name: currentLevel.name,
                     imageUrl: currentLevel.imageUrl,
                     imagePath: currentLevel.imagePath,
                     feedback: currentLevel.feedback,
-                    placementFeedback: currentLevel.placementFeedback,
-                    goodZones: currentLevel.goodZones,
-                    perfectZones: currentLevel.perfectZones,
+                    placementFeedback,
+                    goodZones,
+                    perfectZones,
+                    zoneSets: currentLevel.zoneSets, // Also save raw zone sets
                     updatedAt: serverTimestamp()
                 };
                 
@@ -954,50 +1406,116 @@
                 }
                 
                 hideLoading();
-                showToast('Level saved!', 'success');
-            } catch (error) {
-                console.error('Save error:', error);
+                showToast('Saved!', 'success');
+            } catch (err) {
                 hideLoading();
-                showToast('Save failed: ' + error.message, 'error');
+                showToast('Save failed: ' + err.message, 'error');
             }
         }
         
         function newLevel() {
             currentLevel = {
                 id: null, name: '', imageUrl: '', imagePath: '',
-                feedback: '', placementFeedback: '',
-                goodZones: { white: [], black: [] },
-                perfectZones: { white: [], black: [] }
+                feedback: '', zoneSets: []
             };
-            
             document.getElementById('levelName').value = '';
             document.getElementById('levelFeedback').value = '';
-            document.getElementById('placementFeedback').value = '';
-            
+            document.getElementById('zoneSetEditor').classList.add('hidden');
+            selectedSetId = null;
             loadedImage = null;
-            if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (imageCtx) imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+            if (overlayCtx) overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
             document.getElementById('canvasPlaceholder').classList.remove('hidden');
-            updateZonesList();
+            updateZoneSetsList();
         }
         
-        function undoLastZone() {
-            const zones = currentZoneType === 'good' 
-                ? currentLevel.goodZones[currentColor]
-                : currentLevel.perfectZones[currentColor];
-            
-            if (zones.length > 0) {
-                zones.pop();
-                redrawCanvas();
-                updateZonesList();
+        async function loadLevel(levelId) {
+            showLoading('Loading...');
+            try {
+                const docSnap = await getDoc(doc(db, 'levels', levelId));
+                if (!docSnap.exists()) throw new Error('Not found');
+                
+                const data = docSnap.data();
+                
+                // Try to load zone sets if available, otherwise convert from old format
+                if (data.zoneSets && data.zoneSets.length > 0) {
+                    currentLevel = {
+                        id: docSnap.id,
+                        name: data.name || '',
+                        imageUrl: data.imageUrl,
+                        imagePath: data.imagePath || '',
+                        feedback: data.feedback || '',
+                        zoneSets: data.zoneSets
+                    };
+                } else {
+                    // Convert from old format
+                    currentLevel = {
+                        id: docSnap.id,
+                        name: data.name || '',
+                        imageUrl: data.imageUrl,
+                        imagePath: data.imagePath || '',
+                        feedback: data.feedback || '',
+                        zoneSets: convertOldFormat(data)
+                    };
+                }
+                
+                document.getElementById('levelName').value = currentLevel.name;
+                document.getElementById('levelFeedback').value = currentLevel.feedback;
+                
+                loadImageToCanvas(currentLevel.imageUrl);
+                selectedSetId = currentLevel.zoneSets[0]?.id || null;
+                updateZoneSetsList();
+                updateZoneSetEditor();
+                
+                // Switch to editor
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                document.querySelector('[data-tab="editor"]').classList.add('active');
+                document.getElementById('editorTab').classList.remove('hidden');
+                
+                hideLoading();
+            } catch (err) {
+                hideLoading();
+                showToast('Load failed', 'error');
             }
         }
         
-        function clearAllZones() {
-            if (!confirm('Clear all zones?')) return;
-            currentLevel.goodZones = { white: [], black: [] };
-            currentLevel.perfectZones = { white: [], black: [] };
-            redrawCanvas();
-            updateZonesList();
+        function convertOldFormat(data) {
+            const sets = [];
+            
+            ['white', 'black'].forEach(color => {
+                const goodZones = data.goodZones?.[color] || [];
+                const perfectZones = data.perfectZones?.[color] || [];
+                
+                if (goodZones.length > 0 || perfectZones.length > 0) {
+                    // Create one set per perfect zone, or one set if no perfect zones
+                    if (perfectZones.length > 0) {
+                        perfectZones.forEach((pz, idx) => {
+                            sets.push({
+                                id: 'set_' + color + '_' + idx,
+                                name: `${color.charAt(0).toUpperCase() + color.slice(1)} Set ${idx + 1}`,
+                                color,
+                                placementFeedback: data.placementFeedback || '',
+                                perfectHint: pz.hint || '',
+                                goodZones: idx === 0 ? goodZones.map(z => ({...z})) : [],
+                                perfectZone: { x: pz.x, y: pz.y, width: pz.width, height: pz.height }
+                            });
+                        });
+                    } else if (goodZones.length > 0) {
+                        sets.push({
+                            id: 'set_' + color + '_0',
+                            name: `${color.charAt(0).toUpperCase() + color.slice(1)} Set`,
+                            color,
+                            placementFeedback: '',
+                            perfectHint: '',
+                            goodZones: goodZones.map(z => ({...z})),
+                            perfectZone: null
+                        });
+                    }
+                }
+            });
+            
+            return sets;
         }
 
         // ============================================
@@ -1005,17 +1523,15 @@
         // ============================================
         async function loadLevelsList() {
             const container = document.getElementById('levelsList');
-            
             if (!firebaseReady) {
-                container.innerHTML = '<p class="text-gray-500 col-span-full text-center py-12">Please sign in first</p>';
+                container.innerHTML = '<p class="text-gray-500 col-span-full text-center py-12">Sign in first</p>';
                 return;
             }
             
             try {
                 const snapshot = await getDocs(collection(db, 'levels'));
-                
                 if (snapshot.empty) {
-                    container.innerHTML = '<p class="text-gray-500 col-span-full text-center py-12">No levels yet. Create one or run migration!</p>';
+                    container.innerHTML = '<p class="text-gray-500 col-span-full text-center py-12">No levels yet</p>';
                     return;
                 }
                 
@@ -1025,175 +1541,104 @@
                     const card = document.createElement('div');
                     card.className = 'level-card';
                     card.innerHTML = `
-                        <img src="${level.imageUrl}" alt="${level.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/></svg>'">
+                        <img src="${level.imageUrl}" alt="${level.name}">
                         <div class="p-3">
-                            <h4 class="font-bold truncate">${level.name || 'Untitled'}</h4>
-                            <p class="text-xs text-gray-400 mt-1">
-                                ${(level.goodZones?.white?.length || 0) + (level.goodZones?.black?.length || 0)} good,
-                                ${(level.perfectZones?.white?.length || 0) + (level.perfectZones?.black?.length || 0)} perfect
-                            </p>
-                            <div class="flex gap-2 mt-3">
-                                <button class="btn btn-outline text-xs flex-1 edit-btn">Edit</button>
-                                <button class="btn btn-danger text-xs delete-btn">×</button>
+                            <h4 class="font-bold truncate text-sm">${level.name || 'Untitled'}</h4>
+                            <div class="flex gap-2 mt-2">
+                                <button class="btn btn-outline btn-sm flex-1 edit-btn">Edit</button>
+                                <button class="btn btn-danger btn-sm del-btn">×</button>
                             </div>
                         </div>
                     `;
-                    
-                    card.querySelector('.edit-btn').addEventListener('click', () => loadLevel(docSnap.id));
-                    card.querySelector('.delete-btn').addEventListener('click', () => deleteLevelById(docSnap.id));
-                    
+                    card.querySelector('.edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadLevel(docSnap.id); });
+                    card.querySelector('.del-btn').addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        if (confirm('Delete?')) {
+                            await deleteDoc(doc(db, 'levels', docSnap.id));
+                            loadLevelsList();
+                        }
+                    });
                     container.appendChild(card);
                 });
-            } catch (error) {
-                console.error('Load levels error:', error);
-                container.innerHTML = '<p class="text-red-400 col-span-full text-center py-12">Error loading levels</p>';
-            }
-        }
-        
-        async function loadLevel(levelId) {
-            showLoading('Loading level...');
-            
-            try {
-                const docSnap = await getDoc(doc(db, 'levels', levelId));
-                if (!docSnap.exists()) throw new Error('Level not found');
-                
-                const data = docSnap.data();
-                currentLevel = {
-                    id: docSnap.id,
-                    name: data.name || '',
-                    imageUrl: data.imageUrl,
-                    imagePath: data.imagePath || '',
-                    feedback: data.feedback || '',
-                    placementFeedback: data.placementFeedback || '',
-                    goodZones: data.goodZones || { white: [], black: [] },
-                    perfectZones: data.perfectZones || { white: [], black: [] }
-                };
-                
-                document.getElementById('levelName').value = currentLevel.name;
-                document.getElementById('levelFeedback').value = currentLevel.feedback;
-                document.getElementById('placementFeedback').value = currentLevel.placementFeedback;
-                
-                loadImageToCanvas(currentLevel.imageUrl);
-                updateZonesList();
-                
-                // Switch to editor tab
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-                document.querySelector('[data-tab="editor"]').classList.add('active');
-                document.getElementById('editorTab').classList.remove('hidden');
-                
-                hideLoading();
-            } catch (error) {
-                console.error('Load level error:', error);
-                hideLoading();
-                showToast('Failed to load level', 'error');
-            }
-        }
-        
-        async function deleteLevelById(levelId) {
-            if (!confirm('Delete this level?')) return;
-            
-            try {
-                await deleteDoc(doc(db, 'levels', levelId));
-                showToast('Level deleted', 'success');
-                loadLevelsList();
-            } catch (error) {
-                console.error('Delete error:', error);
-                showToast('Delete failed', 'error');
+            } catch (err) {
+                container.innerHTML = '<p class="text-red-400 col-span-full text-center py-12">Error</p>';
             }
         }
         
         document.getElementById('refreshLevelsBtn').addEventListener('click', loadLevelsList);
 
         // ============================================
-        // MIGRATION
+        // MIGRATION (same as before, condensed)
         // ============================================
         const originalGameImages = [
-            { src: 'https://pdr-assets.b-cdn.net/collections/herbert-geddes-life-in-japan/People_in_boats_on_waterways_through_rice_fields;_snow-covered_mountain_in_background._(19329128803).jpg', name: 'Mountain Rice Fields', goodZones: { white: [{ x: 25, y: 75, width: 75, height: 25 }], black: [{ x: 0.9, y: 0, width: 40.5, height: 38.1 }, { x: 41.4, y: 0, width: 57.1, height: 25 }] }, perfectZones: { white: [{ id: 'water_centered', hint: "This spot is shifted right to align with the clearest part of the water.", x: 40, y: 75, width: 30, height: 20 }], black: [{ id: 'sky_peak_centered', hint: "This spot is centered above the peak of the mountain.", x: 35.75, y: 3, width: 30, height: 20 }, { id: 'sky_left_balanced', hint: "This spot is balanced between the edge and the mountain's peak.", x: 10.3, y: 5.7, width: 30, height: 20 }] } },
-            { src: 'https://pdr-assets.b-cdn.net/collections/nathaniel-hawthorne-s-tanglewood-tales-illustrated-by-virginia-frances-sterrett-1921/4_2fabcd2a0_b.jpg', name: 'Tanglewood Dragon', goodZones: { white: [], black: [{ x: 5.6, y: 67, width: 88.885, height: 33 }, { x: 5.6, y: 53, width: 34.4, height: 14 }] }, perfectZones: { white: [], black: [{ id: 'creative', hint: "Excellent creative composition!", x: 10, y: 58, width: 30, height: 20 }, { id: 'centered', hint: "Solid choice! For more dynamic composition, notice where the dragon is looking.", x: 35, y: 73.5, width: 30, height: 20 }] } },
+            { src: 'https://pdr-assets.b-cdn.net/collections/herbert-geddes-life-in-japan/People_in_boats_on_waterways_through_rice_fields;_snow-covered_mountain_in_background._(19329128803).jpg', name: 'Mountain Rice Fields', goodZones: { white: [{ x: 25, y: 75, width: 75, height: 25 }], black: [{ x: 0.9, y: 0, width: 40.5, height: 38.1 }, { x: 41.4, y: 0, width: 57.1, height: 25 }] }, perfectZones: { white: [{ id: 'water_centered', hint: "Shifted right to align with the clearest water.", x: 40, y: 75, width: 30, height: 20 }], black: [{ id: 'sky_peak_centered', hint: "Centered above the mountain peak.", x: 35.75, y: 3, width: 30, height: 20 }, { id: 'sky_left_balanced', hint: "Balanced between edge and peak.", x: 10.3, y: 5.7, width: 30, height: 20 }] } },
+            { src: 'https://pdr-assets.b-cdn.net/collections/nathaniel-hawthorne-s-tanglewood-tales-illustrated-by-virginia-frances-sterrett-1921/4_2fabcd2a0_b.jpg', name: 'Tanglewood Dragon', goodZones: { white: [], black: [{ x: 5.6, y: 67, width: 88.885, height: 33 }, { x: 5.6, y: 53, width: 34.4, height: 14 }] }, perfectZones: { white: [], black: [{ id: 'creative', hint: "Excellent creative composition!", x: 10, y: 58, width: 30, height: 20 }, { id: 'centered', hint: "Solid! For more dynamic composition, notice where the dragon looks.", x: 35, y: 73.5, width: 30, height: 20 }] } },
             { src: 'https://pdr-assets.b-cdn.net/collections/correct-postures-for-housework-1920s/3856279792_f5eb5d1399_z.jpg', name: 'Housework Postures', goodZones: { white: [], black: [{ x: 22.47, y: 0, width: 43.2, height: 36.7 }] }, perfectZones: { white: [], black: [{ x: 29.2, y: 8.35, width: 30, height: 20 }] } },
-            { src: 'https://pdr-assets.b-cdn.net/collections/through-the-first-antarctic-night-1900/48103624963_32ec491012_b.jpg', name: 'Antarctic Iceberg', goodZones: { white: [{ x: 0, y: 5, width: 100, height: 32.4 }], black: [{ x: 0, y: 5, width: 100, height: 32.4 }] }, perfectZones: { white: [{ x: 38, y: 11.2, width: 30, height: 20 }], black: [{ x: 38, y: 11.2, width: 30, height: 20 }] }, placementFeedback: "The 'perfect' spot is centered above the iceberg for better balance." },
+            { src: 'https://pdr-assets.b-cdn.net/collections/through-the-first-antarctic-night-1900/48103624963_32ec491012_b.jpg', name: 'Antarctic Iceberg', goodZones: { white: [{ x: 0, y: 5, width: 100, height: 32.4 }], black: [{ x: 0, y: 5, width: 100, height: 32.4 }] }, perfectZones: { white: [{ x: 38, y: 11.2, width: 30, height: 20 }], black: [{ x: 38, y: 11.2, width: 30, height: 20 }] }, placementFeedback: "Perfect spot is centered above the iceberg." },
             { src: 'https://pdr-assets.b-cdn.net/collections/flowers-and-pictures-of-the-holy-land/10171710394_a7bd417a9f_o.jpg', name: 'Holy Land Flowers', goodZones: { white: [], black: [{ x: 1.7, y: 2.5, width: 96.6, height: 22.5 }] }, perfectZones: { white: [], black: [{ x: 35, y: 3.75, width: 30, height: 20 }] } },
-            { src: 'https://pdr-assets.b-cdn.net/collections/photographs-of-models-of-the-moon-1874/45077382895_af6af4615d_b.jpg', name: 'Moon Model', goodZones: { white: [{ x: 52.1, y: 4.5, width: 42.5, height: 29.775 }], black: [] }, perfectZones: { white: [{ x: 54.5, y: 8.5, width: 30, height: 20 }], black: [] }, placementFeedback: "The 'perfect' spot uses the largest part of the dark, clear area." },
-            { src: 'https://pdr-assets.b-cdn.net/collections/herbert-geddes-life-in-japan/Women_preparing_rice_field_in_mud._(19327195784).jpg', name: 'Rice Field Workers', goodZones: { white: [{ x: 38.9, y: 0, width: 59.3, height: 20.2 }], black: [] }, perfectZones: { white: [{ x: 50.5, y: 0.1, width: 30, height: 20 }], black: [] }, placementFeedback: "The 'perfect' spot uses the largest part of the dark, clear area." },
-            { src: 'https://pdr-assets.b-cdn.net/shop/cp-2-small.jpg', name: 'Busy Image (No Spot)', goodZones: { white: [], black: [] }, perfectZones: { white: [], black: [] }, feedback: "There is no good spot. This image is too busy for text." },
+            { src: 'https://pdr-assets.b-cdn.net/collections/photographs-of-models-of-the-moon-1874/45077382895_af6af4615d_b.jpg', name: 'Moon Model', goodZones: { white: [{ x: 52.1, y: 4.5, width: 42.5, height: 29.775 }], black: [] }, perfectZones: { white: [{ x: 54.5, y: 8.5, width: 30, height: 20 }], black: [] }, placementFeedback: "Uses the largest dark, clear area." },
+            { src: 'https://pdr-assets.b-cdn.net/collections/herbert-geddes-life-in-japan/Women_preparing_rice_field_in_mud._(19327195784).jpg', name: 'Rice Field Workers', goodZones: { white: [{ x: 38.9, y: 0, width: 59.3, height: 20.2 }], black: [] }, perfectZones: { white: [{ x: 50.5, y: 0.1, width: 30, height: 20 }], black: [] }, placementFeedback: "Uses the largest dark area." },
+            { src: 'https://pdr-assets.b-cdn.net/shop/cp-2-small.jpg', name: 'Busy Image (No Spot)', goodZones: { white: [], black: [] }, perfectZones: { white: [], black: [] }, feedback: "No good spot. Too busy for text." },
             { src: 'https://pdr-assets.b-cdn.net/collections/watercolours-from-a-16th-century-de-materia-medica/20879595101_be37994770_o.jpg', name: 'Materia Medica', goodZones: { white: [], black: [{ x: 12.25, y: 50.5, width: 35.8, height: 30.5 }] }, perfectZones: { white: [], black: [{ x: 15.15, y: 55.75, width: 30, height: 20 }] } },
-            { src: 'https://pdr-assets.b-cdn.net/collections/los-angeles-alligator-farm/alligator-farm-14.jpg', name: 'Alligator Farm (No Spot)', goodZones: { white: [], black: [] }, perfectZones: { white: [], black: [] }, feedback: "There is no good spot. This image is too busy for text." }
+            { src: 'https://pdr-assets.b-cdn.net/collections/los-angeles-alligator-farm/alligator-farm-14.jpg', name: 'Alligator Farm (No Spot)', goodZones: { white: [], black: [] }, perfectZones: { white: [], black: [] }, feedback: "No good spot. Too busy for text." }
         ];
         
-        document.getElementById('startMigrationBtn').addEventListener('click', startMigration);
-        
-        async function startMigration() {
-            if (!firebaseReady) {
-                showToast('Please sign in first', 'error');
-                return;
-            }
+        document.getElementById('startMigrationBtn').addEventListener('click', async () => {
+            if (!firebaseReady) return showToast('Sign in first', 'error');
             
-            const progressDiv = document.getElementById('migrationProgress');
-            const countEl = document.getElementById('migrationCount');
-            const barEl = document.getElementById('migrationBar');
-            const logEl = document.getElementById('migrationLog');
+            const progress = document.getElementById('migrationProgress');
+            const count = document.getElementById('migrationCount');
+            const bar = document.getElementById('migrationBar');
+            const log = document.getElementById('migrationLog');
             
-            progressDiv.classList.remove('hidden');
-            logEl.innerHTML = '';
+            progress.classList.remove('hidden');
+            log.innerHTML = '';
             
+            let done = 0;
             const total = originalGameImages.length;
-            let completed = 0;
             
-            function log(message, isError = false) {
-                const line = document.createElement('div');
-                line.className = isError ? 'text-red-400' : 'text-green-400';
-                line.textContent = message;
-                logEl.appendChild(line);
-                logEl.scrollTop = logEl.scrollHeight;
-            }
-            
-            for (const imageData of originalGameImages) {
+            for (const img of originalGameImages) {
                 try {
-                    log(`Downloading: ${imageData.name}...`);
+                    log.innerHTML += `<div class="text-gray-400">Downloading: ${img.name}...</div>`;
+                    const resp = await fetch(img.src);
+                    if (!resp.ok) throw new Error('Fetch failed');
+                    const blob = await resp.blob();
                     
-                    const response = await fetch(imageData.src);
-                    if (!response.ok) throw new Error('Failed to fetch');
-                    const blob = await response.blob();
-                    
-                    const fileName = `${Date.now()}_${imageData.name.replace(/[^a-z0-9]/gi, '_')}.jpg`;
+                    const fileName = `${Date.now()}_${img.name.replace(/[^a-z0-9]/gi, '_')}.jpg`;
                     const storageRef = ref(storage, `game-images/${fileName}`);
                     await uploadBytes(storageRef, blob);
                     const url = await getDownloadURL(storageRef);
                     
-                    log(`Uploaded: ${fileName}`);
-                    
                     await addDoc(collection(db, 'levels'), {
-                        name: imageData.name,
+                        name: img.name,
                         imageUrl: url,
                         imagePath: `game-images/${fileName}`,
-                        feedback: imageData.feedback || '',
-                        placementFeedback: imageData.placementFeedback || '',
-                        goodZones: imageData.goodZones,
-                        perfectZones: imageData.perfectZones,
+                        feedback: img.feedback || '',
+                        placementFeedback: img.placementFeedback || '',
+                        goodZones: img.goodZones,
+                        perfectZones: img.perfectZones,
                         createdAt: serverTimestamp(),
                         updatedAt: serverTimestamp()
                     });
                     
-                    log(`Saved level: ${imageData.name}`);
-                    
-                } catch (error) {
-                    log(`Error: ${imageData.name} - ${error.message}`, true);
+                    log.innerHTML += `<div class="text-green-400">✓ ${img.name}</div>`;
+                } catch (err) {
+                    log.innerHTML += `<div class="text-red-400">✗ ${img.name}: ${err.message}</div>`;
                 }
-                
-                completed++;
-                countEl.textContent = `${completed} / ${total}`;
-                barEl.style.width = `${(completed / total) * 100}%`;
+                done++;
+                count.textContent = `${done} / ${total}`;
+                bar.style.width = `${(done/total)*100}%`;
+                log.scrollTop = log.scrollHeight;
             }
             
-            log('Migration complete!');
-            showToast('Migration completed!', 'success');
-        }
+            showToast('Migration complete!', 'success');
+        });
 
         // ============================================
         // INIT
         // ============================================
-        initCanvas();
+        initCanvases();
+        updateModeIndicator();
     </script>
 </body>
 </html>
